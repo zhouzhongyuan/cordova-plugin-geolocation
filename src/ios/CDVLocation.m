@@ -64,19 +64,19 @@
 
 - (BOOL)isAuthorized
 {
-//    BOOL authorizationStatusClassPropertyAvailable = [CLLocationManager respondsToSelector:@selector(authorizationStatus)]; // iOS 4.2+
-//
-//    if (authorizationStatusClassPropertyAvailable) {
-//        NSUInteger authStatus = [CLLocationManager authorizationStatus];
-//#ifdef __IPHONE_8_0
-//        if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {  //iOS 8.0+
-//            return (authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) || (authStatus == kCLAuthorizationStatusAuthorizedAlways) || (authStatus == kCLAuthorizationStatusNotDetermined);
-//        }
-//#endif
-//        return (authStatus == kCLAuthorizationStatusAuthorized) || (authStatus == kCLAuthorizationStatusNotDetermined);
-//    }
-//
-//    // by default, assume YES (for iOS < 4.2)
+    BOOL authorizationStatusClassPropertyAvailable = [CLLocationManager respondsToSelector:@selector(authorizationStatus)]; // iOS 4.2+
+
+    if (authorizationStatusClassPropertyAvailable) {
+        NSUInteger authStatus = [CLLocationManager authorizationStatus];
+#ifdef __IPHONE_8_0
+        if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {  //iOS 8.0+
+            return (authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) || (authStatus == kCLAuthorizationStatusAuthorizedAlways) || (authStatus == kCLAuthorizationStatusNotDetermined);
+        }
+#endif
+        return (authStatus == kCLAuthorizationStatusAuthorized) || (authStatus == kCLAuthorizationStatusNotDetermined);
+    }
+
+    // by default, assume YES (for iOS < 4.2)
     return YES;
 }
 
