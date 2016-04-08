@@ -16,6 +16,9 @@
 #         specific language governing permissions and limitations
 #         under the License.
 -->
+## iOS定位使用百度定位,在中国更加准确.
+使用方法不变.
+
 
 [![Build Status](https://travis-ci.org/apache/cordova-plugin-geolocation.svg?branch=master)](https://travis-ci.org/apache/cordova-plugin-geolocation)
 
