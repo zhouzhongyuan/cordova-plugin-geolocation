@@ -1,22 +1,3 @@
-/*
- Licensed to the Apache Software Foundation (ASF) under one
- or more contributor license agreements.  See the NOTICE file
- distributed with this work for additional information
- regarding copyright ownership.  The ASF licenses this file
- to you under the Apache License, Version 2.0 (the
- "License"); you may not use this file except in compliance
- with the License.  You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing,
- software distributed under the License is distributed on an
- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- KIND, either express or implied.  See the License for the
- specific language governing permissions and limitations
- under the License.
- */
-
 #import "CDVLocation.h"
 
 #pragma mark Constants
@@ -48,35 +29,54 @@
 
 #pragma mark -
 #pragma mark CDVLocation
-
+//BMKMapManager* _mapManager;
+//BMKLocationService* locService;
 @implementation CDVLocation
 
-@synthesize locationManager, locationData;
+@synthesize locationData;
 
 - (void)pluginInitialize
 {
-    self.locationManager = [[CLLocationManager alloc] init];
-    self.locationManager.delegate = self; // Tells the location manager to send updates to this object
+//    self.locationManager = [[CLLocationManager alloc] init];
+//    self.locationManager.delegate = self; // Tells the location manager to send updates to this object
+//    __locationStarted = NO;
+//    __highAccuracyEnabled = NO;
+//    self.locationData = nil;
+
+    // 要使用百度地图，请先启动BaiduMapManager
+    _mapManager = [[BMKMapManager alloc]init];
+    BOOL ret = [_mapManager start:@"1xuVCetREsI8B46Fk49My1Elac74mrIn" generalDelegate:self];
+    if (!ret) {
+        NSLog(@"manager start failed!");
+    }
     __locationStarted = NO;
     __highAccuracyEnabled = NO;
     self.locationData = nil;
+
+    NSLog(@"begin add location service");
+    _locService = [[BMKLocationService alloc]init];
+    _locService.distanceFilter = 0.0f;
+    _locService.desiredAccuracy = 0;
+    _locService.delegate = self;
+
+    NSLog(@"begin end location service");
 }
 
 - (BOOL)isAuthorized
 {
-    BOOL authorizationStatusClassPropertyAvailable = [CLLocationManager respondsToSelector:@selector(authorizationStatus)]; // iOS 4.2+
-
-    if (authorizationStatusClassPropertyAvailable) {
-        NSUInteger authStatus = [CLLocationManager authorizationStatus];
-#ifdef __IPHONE_8_0
-        if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {  //iOS 8.0+
-            return (authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) || (authStatus == kCLAuthorizationStatusAuthorizedAlways) || (authStatus == kCLAuthorizationStatusNotDetermined);
-        }
-#endif
-        return (authStatus == kCLAuthorizationStatusAuthorized) || (authStatus == kCLAuthorizationStatusNotDetermined);
-    }
-
-    // by default, assume YES (for iOS < 4.2)
+//    BOOL authorizationStatusClassPropertyAvailable = [CLLocationManager respondsToSelector:@selector(authorizationStatus)]; // iOS 4.2+
+//
+//    if (authorizationStatusClassPropertyAvailable) {
+//        NSUInteger authStatus = [CLLocationManager authorizationStatus];
+//#ifdef __IPHONE_8_0
+//        if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {  //iOS 8.0+
+//            return (authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) || (authStatus == kCLAuthorizationStatusAuthorizedAlways) || (authStatus == kCLAuthorizationStatusNotDetermined);
+//        }
+//#endif
+//        return (authStatus == kCLAuthorizationStatusAuthorized) || (authStatus == kCLAuthorizationStatusNotDetermined);
+//    }
+//
+//    // by default, assume YES (for iOS < 4.2)
     return YES;
 }
 
@@ -136,8 +136,11 @@
     // Tell the location manager to start notifying us of location updates. We
     // first stop, and then start the updating to ensure we get at least one
     // update, even if our location did not change.
-    [self.locationManager stopUpdatingLocation];
-    [self.locationManager startUpdatingLocation];
+//    [self.locationManager stopUpdatingLocation];
+//    [self.locationManager startUpdatingLocation];
+    [_locService stopUserLocationService];
+    [_locService startUserLocationService];
+
     __locationStarted = YES;
     if (enableHighAccuracy) {
         __highAccuracyEnabled = YES;
@@ -193,6 +196,7 @@
 - (void)getLocation:(CDVInvokedUrlCommand*)command
 {
     NSString* callbackId = command.callbackId;
+    self->callbackId =callbackId;
     BOOL enableHighAccuracy = [[command argumentAtIndex:0] boolValue];
 
     if ([self isLocationServicesEnabled] == NO) {
@@ -360,6 +364,88 @@
 {
     [self _stopLocation];
     [self.locationManager stopUpdatingHeading];
+}
+- (void)onGetNetworkState:(int)iError
+{
+    if (0 == iError) {
+        NSLog(@"联网成功");
+    }
+    else{
+        NSLog(@"onGetNetworkState %d",iError);
+    }
+
+}
+
+- (void)onGetPermissionState:(int)iError
+{
+    if (0 == iError) {
+        NSLog(@"授权成功");
+    }
+    else {
+        NSLog(@"onGetPermissionState %d",iError);
+    }
+}
+/**
+ *在地图View将要启动定位时，会调用此函数
+ *@param mapView 地图View
+ */
+- (void)willStartLocatingUser
+{
+    NSLog(@"start locate");
+}
+
+///**
+// *用户方向更新后，会调用此函数
+// *@param userLocation 新的用户位置
+// */
+//- (void)didUpdateUserHeading:(BMKUserLocation *)userLocation
+//{
+//    NSLog(@"heading is %@",userLocation.heading);
+//}
+
+/**
+ *用户位置更新后，会调用此函数
+ *@param userLocation 新的用户位置
+ */
+- (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation
+{
+        NSLog(@"didUpdateUserLocation lat %f,long %f",userLocation.location.coordinate.latitude,userLocation.location.coordinate.longitude);
+
+    [_locService stopUserLocationService];
+    __locationStarted = NO;
+
+    CDVPluginResult* result = nil;
+    CLLocation* lData = userLocation.location;
+
+        NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:8];
+
+            [returnInfo setObject:[NSNumber numberWithDouble:lData.coordinate.latitude] forKey:@"latitude"];
+            [returnInfo setObject:[NSNumber numberWithDouble:lData.coordinate.longitude] forKey:@"longitude"];
+
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
+    if (result) {
+        [self.commandDelegate sendPluginResult:result callbackId:self->callbackId];
+    }
+
+}
+
+/**
+ *在地图View停止定位后，会调用此函数
+ *@param mapView 地图View
+ */
+- (void)didStopLocatingUser
+{
+    NSLog(@"stop locate");
+}
+
+/**
+ *定位失败后，会调用此函数
+ *@param mapView 地图View
+ *@param error 错误号，参考CLError.h中定义的错误号
+ */
+- (void)didFailToLocateUserWithError:(NSError *)error
+{
+    NSLog(@"location error");
 }
 
 @end
