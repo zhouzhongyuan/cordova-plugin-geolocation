@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-geolocation",
+  "name": "cordova-plugin-geolocation-baidu",
   "version": "2.1.1-dev",
-  "description": "Cordova Geolocation Plugin",
+  "description": "Cordova Geolocation Plugin with Baidu Map Location SDK",
   "cordova": {
-    "id": "cordova-plugin-geolocation",
+    "id": "cordova-plugin-geolocation-baidu",
     "platforms": [
       "android",
       "amazon-fireos",
@@ -19,9 +19,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/apache/cordova-plugin-geolocation"
+    "url": "https://github.com/zhouzhongyuan/cordova-plugin-geolocation-baidu"
   },
   "keywords": [
+    "baidu",
+    "location",
     "cordova",
     "geolocation",
     "ecosystem:cordova",
