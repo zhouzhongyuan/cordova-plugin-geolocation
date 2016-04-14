@@ -21,7 +21,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:rim="http://www.blackberry.com/ns/widgets"
 xmlns:android="http://schemas.android.com/apk/res/android"
-           id="cordova-plugin-geolocation"
+           id="cordova-plugin-geolocation-baidu"
       version="2.1.1-dev">
 
     <name>Geolocation</name>
@@ -30,9 +30,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     <keywords>cordova,geolocation</keywords>
     <repo>https://git-wip-us.apache.org/repos/asf/cordova-plugin-geolocation.git</repo>
     <issue>https://issues.apache.org/jira/browse/CB/component/12320638</issue>
-
-    <dependency id="cordova-plugin-compat" version="^1.0.0" />
-
+    <preference name="BAIDUMAPKEY" />
     <!-- android -->
     <platform name="android">
 
@@ -48,6 +46,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         </config-file>
 
         <source-file src="src/android/Geolocation.java" target-dir="src/org/apache/cordova/geolocation/" />
+        <source-file src="src/android/PermissionHelper.java" target-dir="src/org/apache/cordova/geolocation/" />
 
         <js-module src="www/android/geolocation.js" name="geolocation">
             <clobbers target="navigator.geolocation" />
@@ -72,7 +71,6 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 
     <!-- ios -->
     <platform name="ios">
-
         <js-module src="www/Coordinates.js" name="Coordinates">
             <clobbers target="Coordinates" />
         </js-module>
@@ -93,6 +91,31 @@ xmlns:android="http://schemas.android.com/apk/res/android"
                 <feature name="Geolocation">
                     <param name="ios-package" value="CDVLocation"/>
                 </feature>
+                <preference name="BAIDUMAPKEY" value="$BAIDUMAPKEY" />
+        </config-file>
+        <!--<config-file target="*-Info.plist" parent="CFBundleURLTypes">-->
+            <!--<array>-->
+                <!--<dict>-->
+                    <!--<key>CFBundleURLName</key>-->
+                    <!--<string>weixin</string>-->
+                    <!--<key>CFBundleURLSchemes</key>-->
+                    <!--<array>-->
+                        <!--<string>$WECHATAPPID</string>-->
+                    <!--</array>-->
+                <!--</dict>-->
+            <!--</array>-->
+        <!--</config-file>-->
+        <config-file target="*-Info.plist" parent="CFBundleURLTypes">
+            <array>
+                <dict>
+                    <key>CFBundleURLName</key>
+                    <string>baidumap</string>
+                    <key>CFBundleURLSchemes</key>
+                    <array>
+                        <string>$BAIDUMAPKEY</string>
+                    </array>
+                </dict>
+            </array>
         </config-file>
         <header-file src="src/ios/CDVLocation.h" />
         <source-file src="src/ios/CDVLocation.m" />
@@ -112,10 +135,10 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         // baidu framework
         <framework src="src/ios/libs/BaiduMapAPI_Base.framework" custom="true" />
         <framework src="src/ios/libs/BaiduMapAPI_Location.framework" custom="true" />
-
         <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
             <string></string>
         </config-file>
+
 
     </platform>
 

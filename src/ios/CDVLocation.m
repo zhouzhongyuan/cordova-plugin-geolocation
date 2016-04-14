@@ -45,7 +45,11 @@
 
     // 要使用百度地图，请先启动BaiduMapManager
     _mapManager = [[BMKMapManager alloc]init];
-    BOOL ret = [_mapManager start:@"1xuVCetREsI8B46Fk49My1Elac74mrIn" generalDelegate:self];
+    //NSString *appId = [[self.commandDelegate settings] objectForKey:@"api_key"];
+    NSString* appId = [[self.commandDelegate settings] objectForKey:@"baidumapkey"];
+    //NSString* appId = [[self.commandDelegate settings] objectForKey:@"wechatappid"];
+    NSLog(@"%@",appId);
+    BOOL ret = [_mapManager start:appId generalDelegate:self];
     if (!ret) {
         NSLog(@"manager start failed!");
     }
@@ -64,19 +68,19 @@
 
 - (BOOL)isAuthorized
 {
-    BOOL authorizationStatusClassPropertyAvailable = [CLLocationManager respondsToSelector:@selector(authorizationStatus)]; // iOS 4.2+
-
-    if (authorizationStatusClassPropertyAvailable) {
-        NSUInteger authStatus = [CLLocationManager authorizationStatus];
-#ifdef __IPHONE_8_0
-        if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {  //iOS 8.0+
-            return (authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) || (authStatus == kCLAuthorizationStatusAuthorizedAlways) || (authStatus == kCLAuthorizationStatusNotDetermined);
-        }
-#endif
-        return (authStatus == kCLAuthorizationStatusAuthorized) || (authStatus == kCLAuthorizationStatusNotDetermined);
-    }
-
-    // by default, assume YES (for iOS < 4.2)
+//    BOOL authorizationStatusClassPropertyAvailable = [CLLocationManager respondsToSelector:@selector(authorizationStatus)]; // iOS 4.2+
+//
+//    if (authorizationStatusClassPropertyAvailable) {
+//        NSUInteger authStatus = [CLLocationManager authorizationStatus];
+//#ifdef __IPHONE_8_0
+//        if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {  //iOS 8.0+
+//            return (authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) || (authStatus == kCLAuthorizationStatusAuthorizedAlways) || (authStatus == kCLAuthorizationStatusNotDetermined);
+//        }
+//#endif
+//        return (authStatus == kCLAuthorizationStatusAuthorized) || (authStatus == kCLAuthorizationStatusNotDetermined);
+//    }
+//
+//    // by default, assume YES (for iOS < 4.2)
     return YES;
 }
 
