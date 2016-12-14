@@ -19,6 +19,10 @@
 ## iOS定位使用百度定位,在中国更加准确.
 使用方法不变.
 
+## Todo
+- 把Android和iOS都改为基于百度SDK的
+- 添加常见问题
+- 更新这个repo
 
 [![Build Status](https://travis-ci.org/apache/cordova-plugin-geolocation.svg?branch=master)](https://travis-ci.org/apache/cordova-plugin-geolocation)
 
